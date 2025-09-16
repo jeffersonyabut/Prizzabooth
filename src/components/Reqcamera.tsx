@@ -15,7 +15,6 @@ export function Reqcamera() {
         const cameras = devices.filter(
           (device) => device.kind === "videoinput"
         );
-
         setDevice(cameras);
 
         if (cameras.length === 0) {
@@ -54,6 +53,7 @@ export function Reqcamera() {
         // streamRef.current = mediaStream;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
+        console.log(err);
       }
     };
 
