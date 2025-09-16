@@ -1,23 +1,58 @@
 import { useEffect, useRef, useState } from "react";
+import { useCamera } from "@/ts/useContext";
 
 export function Reqcamera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [device, setDevice] = useState<MediaDeviceInfo[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const { deviceId } = useCamera();
 
   useEffect(() => {
     const startCamera = async () => {
+      console.log(deviceId);
       try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
+        await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false,
         });
 
-        streamRef.current = mediaStream;
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
+        setDevice(cameras);
+        if (cameras.length < 0) {
+          console.log("greater");
+          const selectedDeviceId = cameras[0].deviceId;
+          const mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: selectedDeviceId } },
+            audio: false,
+          });
+
+          streamRef.current = mediaStream;
+
+          if (videoRef.current) {
+            videoRef.current.srcObject = mediaStream;
+          }
         }
+
+        if (cameras.length > 0) {
+          console.log("greater");
+          const mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: deviceId } },
+            audio: false,
+          });
+
+          streamRef.current = mediaStream;
+
+          if (videoRef.current) {
+            videoRef.current.srcObject = mediaStream;
+          }
+        }
+
+        // streamRef.current = mediaStream;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       }
@@ -30,7 +65,7 @@ export function Reqcamera() {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []); // 👈 run once
+  }, [deviceId]); //
 
-  return { videoRef, error };
+  return { videoRef, error, device };
 }
