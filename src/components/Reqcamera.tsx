@@ -10,46 +10,45 @@ export function Reqcamera() {
 
   useEffect(() => {
     const startCamera = async () => {
-      console.log(deviceId);
       try {
-        await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cameras = devices.filter(
           (device) => device.kind === "videoinput"
         );
 
         setDevice(cameras);
-        if (cameras.length < 0) {
-          console.log("greater");
-          const selectedDeviceId = cameras[0].deviceId;
-          const mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { deviceId: { exact: selectedDeviceId } },
-            audio: false,
-          });
 
-          streamRef.current = mediaStream;
-
-          if (videoRef.current) {
-            videoRef.current.srcObject = mediaStream;
-          }
+        if (cameras.length === 0) {
+          setError("No cameras found");
+          return;
         }
 
-        if (cameras.length > 0) {
-          console.log("greater");
-          const mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { deviceId: { exact: deviceId } },
-            audio: false,
-          });
+        // if (cameras.length < 0) {
+        //   console.log("greater");
+        //   const selectedDeviceId = cameras[0].deviceId;
+        //   const mediaStream = await navigator.mediaDevices.getUserMedia({
+        //     video: { deviceId: { exact: selectedDeviceId } },
+        //     audio: false,
+        //   });
 
-          streamRef.current = mediaStream;
+        //   streamRef.current = mediaStream;
 
-          if (videoRef.current) {
-            videoRef.current.srcObject = mediaStream;
-          }
+        //   if (videoRef.current) {
+        //     videoRef.current.srcObject = mediaStream;
+        //   }
+        // }
+
+        const selectedDeviceId = deviceId || cameras[0].deviceId;
+
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: selectedDeviceId } },
+          audio: false,
+        });
+
+        streamRef.current = mediaStream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
         }
 
         // streamRef.current = mediaStream;
