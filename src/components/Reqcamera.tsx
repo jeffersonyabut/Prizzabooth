@@ -11,6 +11,9 @@ export function Reqcamera() {
   useEffect(() => {
     const startCamera = async () => {
       try {
+        // needed this to successfully renders all camera device on first permission
+        await navigator.mediaDevices.getUserMedia({ video: true });
+
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cameras = devices.filter(
           (device) => device.kind === "videoinput"
@@ -21,21 +24,6 @@ export function Reqcamera() {
           setError("No cameras found");
           return;
         }
-
-        // if (cameras.length < 0) {
-        //   console.log("greater");
-        //   const selectedDeviceId = cameras[0].deviceId;
-        //   const mediaStream = await navigator.mediaDevices.getUserMedia({
-        //     video: { deviceId: { exact: selectedDeviceId } },
-        //     audio: false,
-        //   });
-
-        //   streamRef.current = mediaStream;
-
-        //   if (videoRef.current) {
-        //     videoRef.current.srcObject = mediaStream;
-        //   }
-        // }
 
         const selectedDeviceId = deviceId || cameras[0].deviceId;
 
@@ -49,8 +37,6 @@ export function Reqcamera() {
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
-
-        // streamRef.current = mediaStream;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
         console.log(err);
