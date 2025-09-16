@@ -40,7 +40,7 @@ export function Reqcamera() {
         const selectedDeviceId = deviceId || cameras[0].deviceId;
 
         const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: selectedDeviceId } },
+          video: { deviceId: selectedDeviceId },
           audio: false,
         });
 
